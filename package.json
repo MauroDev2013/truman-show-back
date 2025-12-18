@@ -18,5 +18,8 @@
   "bugs": {
     "url": "https://github.com/MauroDev2013/truman-show-back/issues"
   },
-  "homepage": "https://github.com/MauroDev2013/truman-show-back#readme"
+  "homepage": "https://github.com/MauroDev2013/truman-show-back#readme",
+  "dependencies": {
+    "dotenv": "^17.2.3"
+  }
 }

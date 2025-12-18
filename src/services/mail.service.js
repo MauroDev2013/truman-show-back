@@ -24,7 +24,7 @@ async function sendNewsEmail(data) {
   `;
 
   await transporter.sendMail({
-    from: `"Zunzuns" <${process.env.MAIL_USER}>`,
+    from: `"Truman" <${process.env.MAIL_USER}>`,
     to: process.env.MAIL_TO,
     subject: "📩 Nova teoria enviada",
     html,
