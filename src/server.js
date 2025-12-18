@@ -4,6 +4,7 @@ const cors = require("cors");
 
 const newsRoutes = require("./router/news.routes");
 const videosRoutes = require("./router/videos.routes");
+const teoriasRoutes = require("./router/teorias.routes");
 
 const app = express();
 
@@ -16,6 +17,7 @@ app.get("/", (req, res) => {
 
 app.use("/news", newsRoutes);
 app.use("/videos", videosRoutes);
+app.use("/teorias", teoriasRoutes);
 
 const PORT = process.env.PORT || 3001;
 
