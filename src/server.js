@@ -3,6 +3,7 @@ const express = require("express");
 const cors = require("cors");
 
 const newsRoutes = require("./router/news.routes");
+const videosRoutes = require("./router/videos.routes");
 
 const app = express();
 
@@ -14,6 +15,7 @@ app.get("/", (req, res) => {
 });
 
 app.use("/news", newsRoutes);
+app.use("/videos", videosRoutes);
 
 const PORT = process.env.PORT || 3001;
 
