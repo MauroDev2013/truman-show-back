@@ -1,13 +1,16 @@
 const nodemailer = require("nodemailer");
 
 const transporter = nodemailer.createTransport({
-  host: process.env.MAIL_HOST,
-  port: process.env.MAIL_PORT,
-  secure: false,
+  host: "smtp.gmail.com",
+  port: 465,          
+  secure: true,       
   auth: {
     user: process.env.MAIL_USER,
-    pass: process.env.MAIL_PASS,
+    pass: process.env.MAIL_PASS, 
   },
+  connectionTimeout: 10000,
+  greetingTimeout: 10000,
+  socketTimeout: 10000,
 });
 
 async function sendNewsEmail(data) {
@@ -29,6 +32,8 @@ async function sendNewsEmail(data) {
     subject: "📩 Nova teoria enviada",
     html,
   });
+
+  console.log("📩 Email enviado com sucesso");
 }
 
 module.exports = { sendNewsEmail };
