@@ -1,39 +1,26 @@
-const nodemailer = require("nodemailer");
+const { Resend } = require("resend");
 
-const transporter = nodemailer.createTransport({
-  host: "smtp.gmail.com",
-  port: 465,          
-  secure: true,       
-  auth: {
-    user: process.env.MAIL_USER,
-    pass: process.env.MAIL_PASS, 
-  },
-  connectionTimeout: 10000,
-  greetingTimeout: 10000,
-  socketTimeout: 10000,
-});
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 async function sendNewsEmail(data) {
   const { theory, mainFlag, secondaryFlags } = data;
 
-  const html = `
-    <h2>📰 Nova teoria enviada</h2>
-    <p><strong>Flag principal:</strong> ${mainFlag}</p>
-    <p><strong>Flags secundárias:</strong> ${
-      secondaryFlags?.join(", ") || "Nenhuma"
-    }</p>
-    <p><strong>Teoria:</strong></p>
-    <p>${theory}</p>
-  `;
-
-  await transporter.sendMail({
-    from: `"Truman" <${process.env.MAIL_USER}>`,
-    to: process.env.MAIL_TO,
+  await resend.emails.send({
+    from: "Truman <onboarding@resend.dev>",
+    to: [process.env.MAIL_TO],
     subject: "📩 Nova teoria enviada",
-    html,
+    html: `
+      <h2>📰 Nova teoria enviada</h2>
+      <p><strong>Flag principal:</strong> ${mainFlag}</p>
+      <p><strong>Flags secundárias:</strong> ${
+        secondaryFlags?.join(", ") || "Nenhuma"
+      }</p>
+      <p><strong>Teoria:</strong></p>
+      <p>${theory}</p>
+    `,
   });
 
-  console.log("📩 Email enviado com sucesso");
+  console.log("📩 Email enviado via Resend");
 }
 
 module.exports = { sendNewsEmail };
