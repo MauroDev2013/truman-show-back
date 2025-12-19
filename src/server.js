@@ -7,9 +7,13 @@ const { Server } = require("socket.io");
 const app = express();
 const server = http.createServer(app);
 
+/* ===============================
+   SOCKET.IO
+================================ */
 const io = new Server(server, {
   cors: {
-    origin: "*",
+    origin: "*", // permite celular, pc, qualquer origem
+    methods: ["GET", "POST"],
   },
 });
 
@@ -21,7 +25,7 @@ app.get("/", (req, res) => {
 });
 
 /* ===============================
-   CHAT STATE (memória)
+   ESTADO DO CHAT (MEMÓRIA)
 ================================ */
 let messages = [];
 const muted = new Set();
@@ -30,18 +34,19 @@ const banned = new Set();
 const ADMIN_KEY = process.env.ADMIN_KEY || "TRUMAN_OWNER_001";
 
 /* ===============================
-   SOCKET
+   SOCKET EVENTS
 ================================ */
 io.on("connection", (socket) => {
   console.log("🟢 Conectado:", socket.id);
 
+  // usuário padrão
   socket.role = "guest";
   socket.username = `Guest-${socket.id.slice(0, 4)}`;
 
-  // envia histórico
+  // envia mensagens existentes
   socket.emit("chat:init", messages);
 
-  // autenticação admin
+  /* ---------- ADMIN ---------- */
   socket.on("auth", (key) => {
     if (key === ADMIN_KEY) {
       socket.role = "owner";
@@ -50,18 +55,18 @@ io.on("connection", (socket) => {
     }
   });
 
-  // enviar mensagem
+  /* ---------- MENSAGEM ---------- */
   socket.on("chat:send", (text) => {
     if (!text || typeof text !== "string") return;
     if (text.length > 300) return;
-    if (banned.has(socket.id)) return;
     if (muted.has(socket.id)) return;
+    if (banned.has(socket.id)) return;
 
     const msg = {
       id: Date.now(),
       user: socket.username,
       role: socket.role,
-      content: text.replace(/<[^>]*>/g, ""), // sem html
+      content: text.replace(/<[^>]*>/g, ""), // bloqueia HTML
       time: new Date().toLocaleTimeString([], {
         hour: "2-digit",
         minute: "2-digit",
@@ -73,13 +78,13 @@ io.on("connection", (socket) => {
     io.emit("chat:new", msg);
   });
 
-  // mute
+  /* ---------- MUTE ---------- */
   socket.on("chat:mute", (targetId) => {
     if (socket.role !== "owner") return;
     muted.add(targetId);
   });
 
-  // ban
+  /* ---------- BAN ---------- */
   socket.on("chat:ban", (targetId) => {
     if (socket.role !== "owner") return;
     banned.add(targetId);
@@ -110,6 +115,9 @@ function clearAtMidnight() {
 
 clearAtMidnight();
 
+/* ===============================
+   START SERVER
+================================ */
 const PORT = process.env.PORT || 3001;
 server.listen(PORT, () => {
   console.log(`🚀 Server rodando na porta ${PORT}`);
